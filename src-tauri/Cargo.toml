@@ -1,0 +1,103 @@
+[package]
+name = "greenserial"
+version = "1.0.0"
+description = "极致精美且低功耗的串口助手"
+authors = ["you"]
+license = "MIT"
+repository = ""
+edition = "2021"
+rust-version = "1.70"
+
+# ========================================
+# 标准 Release 配置 - 平衡性能和体积
+# ========================================
+[profile.release]
+opt-level = 3           # 最高优化级别
+lto = "fat"             # 全程序链接时优化
+codegen-units = 1       # 单代码生成单元，最大化优化
+panic = "abort"         # 移除 panic 处理代码
+strip = false           # 保留符号（用于调试）
+
+# ========================================
+# 极致体积优化配置
+# ========================================
+[profile.release-size]
+inherits = "release"
+opt-level = "z"         # 优化体积而非速度
+lto = "fat"             # 启用 LTO
+strip = true            # 移除符号表
+panic = "abort"
+codegen-units = 1
+
+# ========================================
+# 极致性能配置
+# ========================================
+[profile.release-speed]
+inherits = "release"
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = false
+
+# ========================================
+# Windows 特定优化
+# ========================================
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe"  # 使用 LLD 链接器，更快更小
+
+[target.i686-pc-windows-msvc]
+linker = "rust-lld.exe"
+
+[dependencies]
+# Tauri 核心 - 使用最小功能集
+tauri = { version = "2", features = ["wry"], default-features = false }
+tauri-plugin-shell = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-global-shortcut = "2"
+
+# 序列化 - 使用最小特征
+serde = { version = "1.0", features = ["derive"], default-features = false }
+serde_json = "1.0"
+
+# 异步运行时 - 只启用必要功能
+tokio = { version = "1.35", features = ["rt-multi-thread", "sync", "time", "macros"], default-features = false }
+
+# 串口 - 标准配置
+serialport = "4.3"
+
+# 时间和日志
+chrono = { version = "0.4", features = ["serde", "clock"], default-features = false }
+tracing = { version = "0.1", default-features = false }
+tracing-subscriber = { version = "0.3", features = ["fmt"], default-features = false }
+
+# 错误处理
+thiserror = "1.0"
+anyhow = { version = "1.0", default-features = false }
+
+# 并发集合
+dashmap = { version = "5.5", default-features = false }
+
+# 其他工具
+once_cell = "1.19"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+# ========================================
+# 构建脚本配置
+# ========================================
+[package.metadata.bundle]
+name = "GreenSerial"
+identifier = "com.greenserial.app"
+icon = ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"]
+version = "1.0.0"
+resources = []
+copyright = "Copyright (c) 2024 GreenSerial Team"
+category = "Developer Tool"
+short_description = "A modern, lightweight serial port assistant"

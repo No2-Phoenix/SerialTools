@@ -1,0 +1,558 @@
+/**
+ * GreenSerial 多主题系统
+ * 4套极致审美的色彩主题方案
+ * 符合 WCAG 无障碍标准
+ */
+
+/* ============================================
+   基础变量定义
+   ============================================ */
+:root {
+  /* 通用过渡 */
+  --theme-transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ============================================
+   主题 1: 深色专业版 (Default Dark)
+   纯黑/深灰背景，青蓝色强调色，极客感
+   ============================================ */
+[data-theme="dark"] {
+  /* 背景渐变 */
+  --bg-gradient: linear-gradient(180deg, #0a0c10 0%, #11141a 50%, #0d0f14 100%);
+  --bg-primary: #0a0c10;
+  --bg-secondary: #11141a;
+  --bg-tertiary: #1a1f28;
+  --bg-elevated: #1e232d;
+  --bg-overlay: rgba(10, 12, 16, 0.95);
+  
+  /* 文字颜色 - WCAG AA  compliant */
+  --text-primary: #f0f4f8;
+  --text-secondary: #b8c4d0;
+  --text-tertiary: #7a8a9a;
+  --text-muted: #4a5568;
+  --text-inverse: #0a0c10;
+  
+  /* 强调色 - 青蓝色系 */
+  --primary-color: #06b6d4;
+  --primary-light: #22d3ee;
+  --primary-dark: #0891b2;
+  --primary-glow: rgba(6, 182, 212, 0.4);
+  
+  /* 功能色 */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
+  
+  /* 边框 */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --border-focus: rgba(6, 182, 212, 0.5);
+  
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px var(--primary-glow);
+  
+  /* 毛玻璃 */
+  --glass-bg: rgba(26, 31, 40, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  
+  /* 状态指示器 */
+  --status-connected: #14b8a6;
+  --status-connecting: #f59e0b;
+  --status-disconnected: #6b7280;
+  
+  /* 日志颜色 */
+  --log-timestamp: #6b7280;
+  --log-rx: #10b981;
+  --log-tx: #3b82f6;
+  --log-system: #f59e0b;
+  --log-error: #ef4444;
+  
+  /* 下拉选择器选项颜色 */
+  --select-option-hover: rgba(255, 255, 255, 0.06);
+  --select-option-focused: rgba(255, 255, 255, 0.08);
+  --select-option-active: rgba(6, 182, 212, 0.15);
+  --select-option-active-hover: rgba(6, 182, 212, 0.2);
+  
+  /* 配置卡片悬浮效果 */
+  --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --card-hover-border-opacity: 0.12;
+}
+
+/* ============================================
+   主题 2: 樱花粉渐变 (Sakura Pink)
+   浅粉微弱渐变，深玫瑰粉强调色
+   ============================================ */
+[data-theme="sakura"] {
+  /* 背景渐变 - 柔和粉色 */
+  --bg-gradient: linear-gradient(180deg, #FFF5F7 0%, #FFEBF0 50%, #FFE3E8 100%);
+  --bg-primary: #FFF5F7;
+  --bg-secondary: #FFEBF0;
+  --bg-tertiary: #FFE3E8;
+  --bg-elevated: #ffffff;
+  --bg-overlay: rgba(255, 245, 247, 0.98);
+  
+  /* 文字颜色 - WCAG AA compliant */
+  --text-primary: #4a1d2a;
+  --text-secondary: #7a3d4f;
+  --text-tertiary: #a66a7d;
+  --text-muted: #d4a6b5;
+  --text-inverse: #FFF5F7;
+  
+  /* 强调色 - 深玫瑰粉 */
+  --primary-color: #d63384;
+  --primary-light: #e85d9a;
+  --primary-dark: #b52a6f;
+  --primary-glow: rgba(214, 51, 132, 0.3);
+  
+  /* 功能色 */
+  --success-color: #20c997;
+  --warning-color: #fd7e14;
+  --error-color: #dc3545;
+  --info-color: #0dcaf0;
+  
+  /* 边框 - 半透明粉色 */
+  --border-subtle: rgba(214, 51, 132, 0.08);
+  --border-default: rgba(214, 51, 132, 0.15);
+  --border-hover: rgba(214, 51, 132, 0.25);
+  --border-focus: rgba(214, 51, 132, 0.4);
+  
+  /* 阴影 - 柔和粉色 */
+  --shadow-sm: 0 1px 3px rgba(214, 51, 132, 0.1);
+  --shadow-md: 0 4px 8px rgba(214, 51, 132, 0.12);
+  --shadow-lg: 0 10px 20px rgba(214, 51, 132, 0.15);
+  --shadow-inner: inset 0 2px 4px rgba(214, 51, 132, 0.06);
+  --shadow-glow: 0 0 20px var(--primary-glow);
+  
+  /* 毛玻璃 */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(214, 51, 132, 0.12);
+  
+  /* 状态指示器 */
+  --status-connected: #14b8a6;
+  --status-connecting: #fd7e14;
+  --status-disconnected: #a66a7d;
+  
+  /* 日志颜色 */
+  --log-timestamp: #a66a7d;
+  --log-rx: #20c997;
+  --log-tx: #0dcaf0;
+  --log-system: #fd7e14;
+  --log-error: #dc3545;
+  
+  /* 下拉选择器选项颜色 - 浅色主题使用极低透明度的黑色 */
+  --select-option-hover: rgba(74, 29, 42, 0.04);
+  --select-option-focused: rgba(74, 29, 42, 0.06);
+  --select-option-active: rgba(214, 51, 132, 0.08);
+  --select-option-active-hover: rgba(214, 51, 132, 0.12);
+  
+  /* 配置卡片悬浮效果 - 与扫描串口按钮一致 */
+  --card-hover-shadow: 0 4px 12px rgba(214, 51, 132, 0.15);
+  --card-hover-border-opacity: 0.25;
+}
+
+/* ============================================
+   主题 3: 克莱因蓝 (Klein Blue)
+   渐变克莱因蓝色系，艺术感与科技感结合
+   ============================================ */
+[data-theme="arctic"] {
+  /* 背景 - 克莱因蓝渐变 */
+  --bg-gradient: linear-gradient(135deg, #E8F4FD 0%, #D6EAF8 25%, #C5DFF5 50%, #A8D0F0 100%);
+  --bg-primary: #E8F4FD;
+  --bg-secondary: #F0F8FF;
+  --bg-tertiary: #D6EAF8;
+  --bg-elevated: #FFFFFF;
+  --bg-overlay: rgba(232, 244, 253, 0.98);
+  
+  /* 文字颜色 - 深海蓝 */
+  --text-primary: #0A2540;
+  --text-secondary: #1A5276;
+  --text-tertiary: #2874A6;
+  --text-muted: #5DADE2;
+  --text-inverse: #E8F4FD;
+  
+  /* 强调色 - 克莱因蓝 */
+  --primary-color: #002FA7;
+  --primary-light: #4169E1;
+  --primary-dark: #001F6E;
+  --primary-glow: rgba(0, 47, 167, 0.3);
+  
+  /* 功能色 */
+  --success-color: #27AE60;
+  --warning-color: #F39C12;
+  --error-color: #E74C3C;
+  --info-color: #3498DB;
+  
+  /* 边框 - 半透明蓝色 */
+  --border-subtle: rgba(0, 47, 167, 0.08);
+  --border-default: rgba(0, 47, 167, 0.15);
+  --border-hover: rgba(0, 47, 167, 0.25);
+  --border-focus: rgba(0, 47, 167, 0.4);
+  
+  /* 阴影 - 蓝色调柔和投影 */
+  --shadow-sm: 0 1px 3px rgba(0, 47, 167, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 47, 167, 0.12);
+  --shadow-lg: 0 8px 24px rgba(0, 47, 167, 0.15);
+  --shadow-inner: inset 0 2px 4px rgba(0, 47, 167, 0.06);
+  --shadow-glow: 0 0 20px var(--primary-glow);
+  
+  /* 毛玻璃 */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(0, 47, 167, 0.1);
+  
+  /* 状态指示器 */
+  --status-connected: #27AE60;
+  --status-connecting: #F39C12;
+  --status-disconnected: #5DADE2;
+  
+  /* 日志颜色 */
+  --log-timestamp: #5DADE2;
+  --log-rx: #27AE60;
+  --log-tx: #002FA7;
+  --log-system: #F39C12;
+  --log-error: #E74C3C;
+  
+  /* 下拉选择器选项颜色 - 浅色主题使用极低透明度的黑色 */
+  --select-option-hover: rgba(10, 37, 64, 0.04);
+  --select-option-focused: rgba(10, 37, 64, 0.06);
+  --select-option-active: rgba(0, 47, 167, 0.08);
+  --select-option-active-hover: rgba(0, 47, 167, 0.12);
+  
+  /* 配置卡片悬浮效果 - 与扫描串口按钮一致 */
+  --card-hover-shadow: 0 4px 12px rgba(0, 47, 167, 0.15);
+  --card-hover-border-opacity: 0.25;
+}
+
+/* ============================================
+   主题 4: 梦幻紫色 (Cyber Lavender)
+   浅紫色渐变背景，极光紫强调色，毛玻璃效果
+   ============================================ */
+[data-theme="lavender"] {
+  /* 背景 - 梦幻紫渐变 */
+  --bg-gradient: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 25%, #ddd6fe 50%, #c4b5fd 100%);
+  --bg-primary: #f3e8ff;
+  --bg-secondary: #e9d5ff;
+  --bg-tertiary: #ddd6fe;
+  --bg-elevated: rgba(255, 255, 255, 0.8);
+  --bg-overlay: rgba(243, 232, 255, 0.95);
+  
+  /* 文字颜色 - WCAG AA compliant */
+  --text-primary: #3b0764;
+  --text-secondary: #5b21b6;
+  --text-tertiary: #7c3aed;
+  --text-muted: #a78bfa;
+  --text-inverse: #f3e8ff;
+  
+  /* 强调色 - 极光紫 */
+  --primary-color: #7c3aed;
+  --primary-light: #a78bfa;
+  --primary-dark: #5b21b6;
+  --primary-glow: rgba(124, 58, 237, 0.35);
+  
+  /* 功能色 */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #06b6d4;
+  
+  /* 边框 - 半透明紫色 */
+  --border-subtle: rgba(124, 58, 237, 0.08);
+  --border-default: rgba(124, 58, 237, 0.15);
+  --border-hover: rgba(124, 58, 237, 0.25);
+  --border-focus: rgba(124, 58, 237, 0.4);
+  
+  /* 阴影 */
+  --shadow-sm: 0 1px 3px rgba(124, 58, 237, 0.1);
+  --shadow-md: 0 4px 12px rgba(124, 58, 237, 0.15);
+  --shadow-lg: 0 8px 24px rgba(124, 58, 237, 0.2);
+  --shadow-inner: inset 0 2px 4px rgba(124, 58, 237, 0.08);
+  --shadow-glow: 0 0 30px var(--primary-glow);
+  
+  /* 毛玻璃 - 强化效果 */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(124, 58, 237, 0.15);
+  
+  /* 状态指示器 */
+  --status-connected: #14b8a6;
+  --status-connecting: #f59e0b;
+  --status-disconnected: #a78bfa;
+  
+  /* 日志颜色 */
+  --log-timestamp: #a78bfa;
+  --log-rx: #10b981;
+  --log-tx: #06b6d4;
+  --log-system: #f59e0b;
+  --log-error: #ef4444;
+  
+  /* 下拉选择器选项颜色 - 浅色主题使用极低透明度的黑色 */
+  --select-option-hover: rgba(59, 7, 100, 0.04);
+  --select-option-focused: rgba(59, 7, 100, 0.06);
+  --select-option-active: rgba(124, 58, 237, 0.08);
+  --select-option-active-hover: rgba(124, 58, 237, 0.12);
+  
+  /* 配置卡片悬浮效果 - 与扫描串口按钮一致 */
+  --card-hover-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+  --card-hover-border-opacity: 0.25;
+}
+
+/* ============================================
+   浅色主题 (Light) - 保留作为备选
+   ============================================ */
+[data-theme="light"] {
+  --bg-gradient: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-elevated: #ffffff;
+  --bg-overlay: rgba(255, 255, 255, 0.98);
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
+  
+  --primary-color: #0ea5e9;
+  --primary-light: #38bdf8;
+  --primary-dark: #0284c7;
+  --primary-glow: rgba(14, 165, 233, 0.25);
+  
+  --success-color: #22c55e;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
+  
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.12);
+  --border-focus: rgba(14, 165, 233, 0.4);
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px var(--primary-glow);
+  
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  
+  --status-connected: #14b8a6;
+  --status-connecting: #f59e0b;
+  --status-disconnected: #94a3b8;
+  
+  --log-timestamp: #94a3b8;
+  --log-rx: #22c55e;
+  --log-tx: #3b82f6;
+  --log-system: #f59e0b;
+  --log-error: #ef4444;
+  
+  /* 下拉选择器选项颜色 */
+  --select-option-hover: rgba(0, 0, 0, 0.04);
+  --select-option-focused: rgba(0, 0, 0, 0.06);
+  --select-option-active: rgba(14, 165, 233, 0.1);
+  --select-option-active-hover: rgba(14, 165, 233, 0.15);
+  
+  /* 配置卡片悬浮效果 */
+  --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --card-hover-border-opacity: 0.12;
+}
+
+/* ============================================
+   通用组件样式 - 适配所有主题
+   ============================================ */
+
+/* 毛玻璃控制面板 */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+}
+
+/* 卡片内阴影 - 下沉效果 */
+.card-inset {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.05),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* 专业日志样式 */
+.log-container {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.log-entry {
+  display: flex;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.log-line-number {
+  color: var(--text-muted);
+  min-width: 40px;
+  text-align: right;
+  user-select: none;
+}
+
+.log-timestamp {
+  color: var(--log-timestamp);
+  min-width: 80px;
+}
+
+.log-content {
+  color: var(--text-primary);
+  flex: 1;
+  word-break: break-all;
+}
+
+.log-content.rx {
+  color: var(--log-rx);
+}
+
+.log-content.tx {
+  color: var(--log-tx);
+}
+
+.log-content.system {
+  color: var(--log-system);
+}
+
+.log-content.error {
+  color: var(--log-error);
+}
+
+/* 非线性进度条 */
+.progress-container {
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-bar.animated {
+  background: linear-gradient(
+    90deg,
+    var(--primary-color) 0%,
+    var(--primary-light) 25%,
+    var(--primary-color) 50%,
+    var(--primary-light) 75%,
+    var(--primary-color) 100%
+  );
+  background-size: 200% 100%;
+  animation: flow-light 2s linear infinite;
+}
+
+@keyframes flow-light {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 仪表盘样式 */
+.dashboard-gauge {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.gauge-bg {
+  fill: none;
+  stroke: var(--bg-tertiary);
+  stroke-width: 8;
+}
+
+.gauge-value {
+  fill: none;
+  stroke: var(--primary-color);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.gauge-text {
+  fill: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+.gauge-label {
+  fill: var(--text-secondary);
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+/* 命令预设卡片 */
+.preset-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.preset-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+.preset-card:active {
+  transform: translateY(-1px);
+}
+
+/* 拖拽分割面板 */
+.resizable-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.resizable-handle {
+  height: 8px;
+  background: var(--bg-tertiary);
+  cursor: row-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.resizable-handle:hover {
+  background: var(--border-hover);
+}
+
+.resizable-handle::before {
+  content: '';
+  width: 40px;
+  height: 4px;
+  background: radial-gradient(circle, var(--text-muted) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.5;
+}
+
+/* 应用主题过渡 */
+* {
+  transition: background-color 0.2s ease, 
+              border-color 0.2s ease, 
+              color 0.2s ease,
+              box-shadow 0.2s ease;
+}

@@ -1,0 +1,88 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "build": {
+    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "npm run dev",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420/"
+  },
+  "bundle": {
+    "active": true,
+    "category": "DeveloperTool",
+    "copyright": "GreenSerial Team",
+    "license": "MIT",
+    "publisher": "GreenSerial",
+    "shortDescription": "A modern, lightweight serial port assistant",
+    "longDescription": "GreenSerial is a high-performance serial port debugging tool with real-time waveform display, protocol parsing, and multi-device management.",
+    "targets": "nsis",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "installMode": "currentUser",
+        "languages": ["SimpChinese", "English"],
+        "displayLanguageSelector": false,
+        "compression": "lzma"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.13",
+      "hardenedRuntime": false
+    },
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    }
+  },
+  "identifier": "greenserial.app",
+  "productName": "GreenSerial",
+  "version": "1.0.0",
+  "app": {
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' ipc://localhost; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'",
+      "capabilities": [
+        {
+          "identifier": "default",
+          "description": "Default capabilities",
+          "local": true,
+          "windows": ["main"],
+          "permissions": [
+            "core:default",
+            "core:event:allow-listen",
+            "core:event:allow-emit"
+          ]
+        }
+      ]
+    },
+    "windows": [
+      {
+        "label": "main",
+        "fullscreen": false,
+        "maximized": false,
+        "resizable": true,
+        "title": "GreenSerial",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600,
+        "visible": true,
+        "decorations": true,
+        "center": true,
+        "zoomHotkeysEnabled": true
+      }
+    ]
+  },
+  "plugins": {}
+}

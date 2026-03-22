@@ -1,0 +1,470 @@
+/**
+ * GreenSerial 响应式布局系统
+ * 支持从 1366x768 (13寸笔记本) 到 4K 显示器的自适应
+ */
+
+/* ========================================
+   基础响应式变量
+   ======================================== */
+:root {
+  /* 布局断点 */
+  --bp-mobile: 640px;
+  --bp-tablet: 768px;
+  --bp-laptop: 1024px;
+  --bp-desktop: 1366px;
+  --bp-wide: 1920px;
+  --bp-4k: 2560px;
+
+  /* 基础间距 - 随屏幕尺寸缩放 */
+  --space-xs: clamp(4px, 0.5vw, 8px);
+  --space-sm: clamp(8px, 1vw, 12px);
+  --space-md: clamp(12px, 1.5vw, 16px);
+  --space-lg: clamp(16px, 2vw, 24px);
+  --space-xl: clamp(24px, 3vw, 32px);
+
+  /* 字体大小 - 响应式缩放 */
+  --text-xs: clamp(10px, 0.8vw, 11px);
+  --text-sm: clamp(11px, 0.9vw, 12px);
+  --text-base: clamp(12px, 1vw, 14px);
+  --text-lg: clamp(14px, 1.2vw, 16px);
+  --text-xl: clamp(16px, 1.5vw, 20px);
+
+  /* 组件尺寸 */
+  --sidebar-width: clamp(200px, 15vw, 240px);
+  --sidebar-collapsed: clamp(56px, 5vw, 64px);
+  --header-height: clamp(48px, 5vh, 64px);
+  --panel-gap: clamp(12px, 1.5vw, 20px);
+
+  /* 内容区域 */
+  --content-max-width: 100%;
+  --content-padding: clamp(12px, 2vw, 24px);
+}
+
+/* ========================================
+   主布局网格 - CSS Grid (已禁用，使用flexbox布局)
+   ======================================== */
+/*
+.app-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar content";
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+*/
+
+.app-layout.sidebar-collapsed {
+  grid-template-columns: var(--sidebar-collapsed) 1fr;
+}
+
+/* 侧边栏 */
+/*
+.app-sidebar {
+  grid-area: sidebar;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+*/
+
+/* 顶部栏 */
+/*
+.app-header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--content-padding);
+}
+*/
+
+/* 内容区 */
+/*
+.app-content {
+  grid-area: content;
+  overflow: hidden;
+  padding: var(--content-padding);
+}
+*/
+
+/* ========================================
+   终端页面布局 - 自适应网格
+   ======================================== */
+.terminal-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--panel-gap);
+  height: 100%;
+}
+
+/* 连接面板 - 响应式 */
+.connection-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+/* 主工作区 - 日志和发送面板 */
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  gap: var(--panel-gap);
+  min-height: 0;
+}
+
+/* 日志面板 */
+.log-section {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 发送面板 */
+.send-section {
+  flex-shrink: 0;
+}
+
+/* ========================================
+   多列布局 - 大屏幕优化
+   ======================================== */
+
+/* 平板及以上：日志区左右分栏 */
+@media (min-width: 1024px) {
+  .workspace {
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  .log-section {
+    grid-row: 1 / -1;
+  }
+
+  .send-section {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* 宽屏：三列布局 */
+@media (min-width: 1920px) {
+  .terminal-layout {
+    grid-template-columns: 320px 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .connection-section {
+    grid-column: 1 / -1;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+/* 4K 屏幕：最大化利用空间 */
+@media (min-width: 2560px) {
+  :root {
+    --content-padding: 32px;
+    --panel-gap: 24px;
+  }
+
+  .terminal-layout {
+    grid-template-columns: 360px 1fr 360px;
+    grid-template-rows: auto 1fr;
+  }
+
+  .connection-section {
+    grid-column: 1 / -1;
+  }
+
+  .workspace {
+    grid-column: 2;
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-widgets {
+    grid-column: 3;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    gap: var(--panel-gap);
+  }
+}
+
+/* ========================================
+   小屏幕适配 (13寸笔记本 1366x768)
+   ======================================== */
+@media (max-width: 1366px) {
+  :root {
+    --sidebar-width: 180px;
+    --content-padding: 12px;
+    --panel-gap: 10px;
+  }
+
+  .app-layout {
+    grid-template-columns: var(--sidebar-width) 1fr;
+  }
+
+  /* 紧凑模式 */
+  .compact-on-small .panel-header {
+    padding: 8px 12px;
+  }
+
+  .compact-on-small .config-row {
+    gap: 8px;
+  }
+
+  .compact-on-small .config-select {
+    width: 100px;
+  }
+}
+
+/* 超小屏幕 - 隐藏侧边栏 */
+@media (max-width: 1024px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "content";
+  }
+
+  .app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* ========================================
+   波形页面布局
+   ======================================== */
+.waveform-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  gap: var(--panel-gap);
+  height: 100%;
+}
+
+.waveform-main {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.waveform-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+/* 宽屏：侧边控制面板 */
+@media (min-width: 1440px) {
+  .waveform-layout {
+    grid-template-columns: 1fr 280px;
+    grid-template-rows: 1fr;
+  }
+
+  .waveform-controls {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+}
+
+/* ========================================
+   预设页面布局
+   ======================================== */
+.payload-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--panel-gap);
+  align-content: start;
+}
+
+/* 不同屏幕尺寸的列数 */
+@media (min-width: 640px) {
+  .payload-layout {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .payload-layout {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1920px) {
+  .payload-layout {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 2560px) {
+  .payload-layout {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ========================================
+   组件级响应式
+   ======================================== */
+
+/* 响应式卡片 */
+.responsive-card {
+  background: rgba(26, 31, 43, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: clamp(8px, 1vw, 12px);
+  padding: var(--space-md);
+}
+
+/* 响应式按钮组 */
+.responsive-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.responsive-actions .btn {
+  flex: 1;
+  min-width: 80px;
+  max-width: 160px;
+}
+
+/* 响应式表格/列表 */
+.responsive-list {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.responsive-list-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-sm);
+}
+
+/* 小屏幕堆叠布局 */
+@media (max-width: 768px) {
+  .responsive-list-item {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+}
+
+/* ========================================
+   字体响应式
+   ======================================== */
+.text-responsive {
+  font-size: var(--text-base);
+}
+
+.text-responsive-sm {
+  font-size: var(--text-sm);
+}
+
+.text-responsive-lg {
+  font-size: var(--text-lg);
+}
+
+/* 代码字体保持可读性 */
+.font-mono-responsive {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: clamp(11px, 0.9vw, 13px);
+}
+
+/* ========================================
+   滚动条响应式
+   ======================================== */
+@media (max-width: 1366px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+@media (min-width: 1920px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* ========================================
+   工具类
+   ======================================== */
+
+/* 隐藏/显示 */
+.hide-on-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hide-on-mobile {
+    display: initial;
+  }
+
+  .show-on-mobile {
+    display: none;
+  }
+}
+
+/* 弹性布局工具 */
+.flex-responsive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.flex-responsive > * {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* 网格工具 */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--panel-gap);
+}
+
+/* 容器查询支持（现代浏览器） */
+@supports (container-type: inline-size) {
+  .container-query-wrapper {
+    container-type: inline-size;
+  }
+
+  @container (min-width: 400px) {
+    .cq-item {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
