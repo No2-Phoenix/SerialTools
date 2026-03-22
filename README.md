@@ -66,6 +66,44 @@ npm run dev
 npm run tauri dev
 ```
 
+### 安装（用户）
+
+注意：本软件仅支持 Windows 10 / Windows 11。
+
+1. 本地构建后生成的 NSIS 安装程序位于仓库内的：
+
+	`src-tauri/target/release/bundle/nsis/`
+
+	例如（相对仓库根）：
+
+	`src-tauri/target/release/bundle/nsis/SerialTools-1.0.0-setup.exe`
+
+2. 运行下载或构建出的 `.exe` 安装程序，按向导完成安装。
+
+3. 推荐在 GitHub Releases 发布正式安装包，仓库中可保留 `releases/` 作为占位或快速访问，但不建议将实际大型二进制直接长期托管在源码仓库中。
+
+已包含的安装程序（仓库内）：
+
+`releases/GreenSerial_1.0.0_x64-setup.exe` （相对仓库根，Windows 安装程序）
+
+
+如果需要从源码构建并生成安装包（开发者）：
+
+```bash
+# 安装前端依赖并构建
+npm install
+npm run build
+
+# 在 src-tauri 目录下构建 Tauri 发布包并生成 NSIS 安装程序
+cd src-tauri
+cargo build --release
+# 或者使用 tauri 的封装命令（根据项目脚本）
+npm run tauri build
+```
+
+构建完成后，NSIS 安装程序位于上文所述的 `src-tauri/target/release/bundle/nsis/` 目录。
+
+
 ### 构建发布
 
 ```bash
