@@ -10,6 +10,7 @@
 - **数据收发** - 支持 ASCII 和 HEX 格式发送与接收
 - **定时发送** - 可配置的自动发送功能
 - **数据日志** - 实时显示收发数据，支持导出
+- **命令预设管理** - 支持预设命令的新增、编辑、删除、导入与导出
 
 ### 特色功能
 
@@ -17,6 +18,7 @@
 - **实时波形** - 波形数据可视化显示
 - **页面保持** - 切换页面时保持串口连接
 - **错误恢复** - 连接中断后自动重连
+- **无硬件模拟回放** - 无物理串口时自动提供 `MOCK://ReplayPort` 用于联调与回归
 
 ## 技术栈
 
@@ -76,7 +78,7 @@ npm run tauri dev
 
 	例如（相对仓库根）：
 
-	`src-tauri/target/release/bundle/nsis/SerialTools-1.0.0-setup.exe`
+	`src-tauri/target/release/bundle/nsis/SerialTools-1.0.1-setup.exe`
 
 2. 运行下载或构建出的 `.exe` 安装程序，按向导完成安装。
 
@@ -84,7 +86,7 @@ npm run tauri dev
 
 已包含的安装程序（仓库内）：
 
-`releases/GreenSerial_1.0.0_x64-setup.exe` （相对仓库根，Windows 安装程序）
+`releases/GreenSerial_1.0.1_x64-setup.exe` （相对仓库根，Windows 安装程序）
 
 
 如果需要从源码构建并生成安装包（开发者）：
@@ -199,16 +201,37 @@ SerialTools/
 - 多主题支持
 - 数据日志与导出
 - 定时发送功能
-- 波形显示功能（开发中）
+- 波形显示功能（基础版）
+
+### v1.0.1 (2026)
+
+- 修复串口连接、发送、回放和波形页之间的状态联动问题
+- 新增无硬件模拟回放，方便离线联调和页面交互回归
+- 完成按需引入重构，减少前端首包体积
+- 补齐串口与 Zynq 设备联机回归脚本
 
 ## 已知问题
 
 - 先连接串口再开启设备可能无法接收数据，建议先开启设备再连接
-- 波形功能仍在完善中
+- 波形功能已支持基础多通道可视化，后续可继续增强协议解析与高级触发
 
 ## 贡献指南
 
 欢迎提交 Issue 和 Pull Request！
+
+## 回归测试
+
+回归清单见：
+
+`docs/regression-checklist.md`
+
+可选脚本：
+
+- `scripts/hardware_serial_smoke.ps1`：串口打开/收发冒烟
+- `scripts/zynq_login_smoke.ps1`：Zynq 串口登录探测（支持 root/root）
+- `scripts/zynq_console_capture.ps1`：串口控制台抓包（适合配合板卡重启定位 console 输出）
+- `scripts/zynq_autodetect_console.ps1`：自动波特率探测（被动读取模式）
+- `scripts/zynq_collect_sysinfo.sh`：在板端 Ubuntu shell 直接采集系统信息（推荐）
 
 ## 许可证
 

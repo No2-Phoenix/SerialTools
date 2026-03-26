@@ -10,7 +10,7 @@
           </span>
         </div>
         <div class="panel-actions">
-          <button class="btn btn-secondary" @click="handleImport">
+          <button class="btn btn-secondary" @click="triggerImport">
             <Upload class="btn-icon" />
             <span>导入</span>
           </button>
@@ -154,25 +154,34 @@
         </div>
       </template>
     </n-modal>
+
+    <input
+      ref="fileInputRef"
+      type="file"
+      accept=".json,application/json"
+      class="hidden-file-input"
+      @change="handleFileSelected"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { NModal, useMessage } from 'naive-ui';
+import { invoke } from '@tauri-apps/api/core';
 import { Package, Plus, Download, Upload, Send, Pencil, Trash2 } from 'lucide-vue-next';
 import { usePayloadStore, type Payload } from '../stores/payload';
-import { useDeviceStore } from '../stores/device';
-import { useLogStore } from '../stores/log';
+import { useSerialConnectionStore } from '../stores/serialConnection';
+import { isMockPort, mockSerialReplay } from '../utils/mockSerialReplay';
 
 const payloadStore = usePayloadStore();
-const deviceStore = useDeviceStore();
-const logStore = useLogStore();
+const serialStore = useSerialConnectionStore();
 const message = useMessage();
 
 const showAddModal = ref(false);
 const isEditing = ref(false);
 const editingId = ref<string | null>(null);
+const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const formData = ref({
   name: '',
@@ -181,7 +190,7 @@ const formData = ref({
   description: '',
 });
 
-const isConnected = computed(() => deviceStore.activeConnections.size > 0);
+const isConnected = computed(() => serialStore.isConnected);
 
 const byteCount = computed(() => {
   if (!formData.value.dataInput) return 0;
@@ -198,46 +207,54 @@ const formatData = (item: Payload) => {
   return new TextDecoder().decode(new Uint8Array(item.data));
 };
 
+const parsePayloadData = (): number[] | null => {
+  if (formData.value.format === 'hex') {
+    const tokens = formData.value.dataInput.trim().split(/\s+/).filter(Boolean);
+    if (tokens.length === 0) {
+      message.error('请输入至少一个 HEX 字节');
+      return null;
+    }
+
+    const invalid = tokens.find((token) => !/^[0-9A-Fa-f]{1,2}$/.test(token));
+    if (invalid) {
+      message.error(`HEX 数据格式错误: ${invalid}`);
+      return null;
+    }
+
+    return tokens.map((token) => parseInt(token, 16));
+  }
+
+  return Array.from(new TextEncoder().encode(formData.value.dataInput));
+};
+
 const handleSave = () => {
-  if (!formData.value.name || !formData.value.dataInput) {
+  const name = formData.value.name.trim();
+  if (!name || !formData.value.dataInput.trim()) {
     message.error('请填写完整信息');
     return;
   }
 
-  let data: number[];
-  if (formData.value.format === 'hex') {
-    data = formData.value.dataInput
-      .trim()
-      .split(/\s+/)
-      .map((b) => parseInt(b, 16))
-      .filter((b) => !isNaN(b));
-  } else {
-    data = Array.from(new TextEncoder().encode(formData.value.dataInput));
-  }
-
+  const data = parsePayloadData();
+  if (!data) return;
   if (data.length === 0) {
     message.error('数据格式错误');
     return;
   }
 
   if (isEditing.value && editingId.value) {
-    const index = payloadStore.payloads.findIndex(p => p.id === editingId.value);
-    if (index !== -1) {
-      payloadStore.payloads[index] = {
-        ...payloadStore.payloads[index],
-        name: formData.value.name,
-        format: formData.value.format,
-        data,
-        description: formData.value.description,
-      };
-    }
+    payloadStore.updatePayload(editingId.value, {
+      name,
+      format: formData.value.format,
+      data,
+      description: formData.value.description.trim(),
+    });
     message.success('保存成功');
   } else {
     payloadStore.addPayload({
-      name: formData.value.name,
+      name,
       format: formData.value.format,
       data,
-      description: formData.value.description,
+      description: formData.value.description.trim(),
     });
     message.success('添加成功');
   }
@@ -263,20 +280,21 @@ const handleDelete = (item: Payload) => {
 };
 
 const handleSend = async (item: Payload) => {
-  const portName = Array.from(deviceStore.activeConnections.keys())[0];
-  if (!portName) {
+  if (!serialStore.currentPort) {
     message.error('请先连接串口');
     return;
   }
 
   try {
-    await deviceStore.sendData(portName, item.data);
-    logStore.addLog({
-      timestamp: Date.now(),
-      portName,
-      direction: 'tx',
-      data: new Uint8Array(item.data),
-    });
+    if (isMockPort(serialStore.currentPort)) {
+      mockSerialReplay.injectResponse(item.data);
+    } else {
+      await invoke('send_serial_data', {
+        portName: serialStore.currentPort,
+        data: item.data,
+      });
+    }
+    serialStore.addLog('tx', item.data);
     message.success('发送成功');
   } catch (e) {
     message.error('发送失败: ' + e);
@@ -284,12 +302,41 @@ const handleSend = async (item: Payload) => {
 };
 
 const handleExport = () => {
-  payloadStore.exportPayloads();
+  const content = payloadStore.exportPayloads();
+  const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `payloads-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
   message.success('导出成功');
 };
 
-const handleImport = () => {
-  message.info('导入功能开发中...');
+const triggerImport = () => {
+  if (!fileInputRef.value) return;
+  fileInputRef.value.value = '';
+  fileInputRef.value.click();
+};
+
+const handleFileSelected = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+
+  try {
+    const content = await file.text();
+    const result = payloadStore.importPayloads(content);
+    if (result.ok) {
+      message.success(`导入成功：${result.importedPayloads} 个预设，${result.importedSequences} 个序列`);
+    } else {
+      message.error(result.message);
+    }
+  } catch (error) {
+    message.error('读取文件失败: ' + error);
+  } finally {
+    input.value = '';
+  }
 };
 
 const closeModal = () => {
@@ -655,5 +702,9 @@ const closeModal = () => {
   gap: 10px;
   padding-top: 16px;
   border-top: 1px solid var(--border-subtle);
+}
+
+.hidden-file-input {
+  display: none;
 }
 </style>

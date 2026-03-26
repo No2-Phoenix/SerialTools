@@ -142,31 +142,16 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { invoke } from '@tauri-apps/api/core';
+import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import CustomSelect from './CustomSelect.vue';
 import { useSerialConnectionStore } from '../stores/serialConnection';
+import { MOCK_PORT_NAME, isMockPort, mockSerialReplay } from '../utils/mockSerialReplay';
 
 const serialStore = useSerialConnectionStore();
 
-// Tauri API 引用
-let invoke: any = null;
-let unlisten: any = null;
-
-// 初始化 Tauri API（同步方式）
-const initTauri = () => {
-  // 使用 Promise 但不阻塞
-  import('@tauri-apps/api/core')
-    .then((tauri) => {
-      invoke = tauri.invoke;
-      console.log('[ConnectionPanel] Tauri API 加载成功');
-      // API 加载成功后自动刷新串口列表
-      refreshPorts();
-      // 设置数据接收监听
-      setupDataListener();
-    })
-    .catch(() => {
-      console.warn('[ConnectionPanel] Tauri API 不可用，当前在浏览器环境中运行');
-    });
-};
+const isTauriRuntime = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+let unlisten: UnlistenFn | null = null;
 
 // 清理数据监听
 const cleanupDataListener = async () => {
@@ -183,14 +168,15 @@ const cleanupDataListener = async () => {
 
 // 设置数据接收监听
 const setupDataListener = async () => {
+  if (!isTauriRuntime) return;
+
   // 如果已经有监听，先清理
   if (unlisten) {
     await cleanupDataListener();
   }
   
   try {
-    const { listen } = await import('@tauri-apps/api/event');
-    unlisten = await listen('serial-data', (event: any) => {
+    unlisten = await listen<{ portName: string; data: number[] }>('serial-data', (event) => {
       const { portName, data } = event.payload;
       console.log('[ConnectionPanel] 收到数据:', portName, data);
       // 添加到日志
@@ -289,16 +275,23 @@ const refreshPorts = async () => {
     console.log('[ConnectionPanel] 开始扫描串口...');
     
     let ports: SerialPortInfo[] = [];
-    
-    if (invoke) {
+
+    if (isTauriRuntime) {
       // Tauri 环境：调用后端 API
-      ports = await invoke('list_serial_ports') as SerialPortInfo[];
+      ports = await invoke<SerialPortInfo[]>('list_serial_ports');
       console.log('[ConnectionPanel] Tauri 扫描结果:', ports);
     } else {
-      // 浏览器环境：使用模拟数据或尝试从设备管理器获取
-      console.log('[ConnectionPanel] 浏览器环境，尝试获取串口信息...');
-      // 在浏览器中无法获取真实串口，显示空列表
-      ports = [];
+      console.log('[ConnectionPanel] 浏览器环境，无法获取真实串口');
+    }
+
+    if (ports.length === 0) {
+      ports = [{
+        name: MOCK_PORT_NAME,
+        vid: null,
+        pid: null,
+        manufacturer: 'Mock Serial Replay',
+        serialNumber: null,
+      }];
     }
     
     portList.value = ports;
@@ -320,7 +313,7 @@ const refreshPorts = async () => {
 
 // 组件加载时初始化
 onMounted(() => {
-  initTauri();
+  refreshPorts();
   
   // 如果已经连接，重新设置数据监听
   if (serialStore.isConnected) {
@@ -346,7 +339,14 @@ const connect = async () => {
   serialStore.setConnecting(true);
   
   try {
-    if (invoke) {
+    const usingMockPort = isMockPort(selectedPort.value);
+
+    if (usingMockPort) {
+      console.log('[ConnectionPanel] 使用模拟串口回放模式');
+      mockSerialReplay.start((data) => {
+        serialStore.addLog('rx', data);
+      });
+    } else if (isTauriRuntime) {
       console.log('[ConnectionPanel] 调用 Tauri API...');
       // 调用 Tauri 后端打开串口
       const result = await invoke('open_serial_port', {
@@ -380,7 +380,9 @@ const connect = async () => {
     console.log('[ConnectionPanel] 连接状态已更新');
     
     // 设置数据监听
-    await setupDataListener();
+    if (!usingMockPort) {
+      await setupDataListener();
+    }
   } catch (error) {
     console.error('[ConnectionPanel] 连接串口失败:', error);
     alert(`连接失败: ${error}`);
@@ -391,10 +393,14 @@ const connect = async () => {
 
 const disconnect = async () => {
   try {
+    const isCurrentMockPort = isMockPort(serialStore.currentPort);
+
     // 先清理数据监听
     await cleanupDataListener();
     
-    if (invoke && serialStore.currentPort) {
+    if (isCurrentMockPort) {
+      mockSerialReplay.stop();
+    } else if (isTauriRuntime && serialStore.currentPort) {
       // 调用 Tauri 后端关闭串口
       await invoke('close_serial_port', {
         portName: serialStore.currentPort

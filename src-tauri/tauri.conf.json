@@ -48,7 +48,7 @@
   },
   "identifier": "greenserial.app",
   "productName": "GreenSerial",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "app": {
     "security": {
       "csp": "default-src 'self'; connect-src 'self' ipc://localhost; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'",

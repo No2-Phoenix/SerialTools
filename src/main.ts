@@ -1,7 +1,6 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { createRouter, createWebHistory } from 'vue-router';
-import naive from 'naive-ui';
 import App from './App.vue';
 import { routes } from './router';
 
@@ -27,6 +26,5 @@ app.directive('ripple', vRipple);
 
 app.use(pinia);
 app.use(router);
-app.use(naive);
 
 app.mount('#app');

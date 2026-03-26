@@ -76,9 +76,12 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue';
+import { invoke } from '@tauri-apps/api/core';
 import { useSerialConnectionStore } from '../stores/serialConnection';
+import { isMockPort, mockSerialReplay } from '../utils/mockSerialReplay';
 
 const serialStore = useSerialConnectionStore();
+const isTauriRuntime = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 const sendMode = ref<'ascii' | 'hex'>('ascii');
 const autoNewline = ref(false);
@@ -88,21 +91,6 @@ const isSending = ref(false);
 const inputData = ref('');
 
 let timerId: number | null = null;
-let invoke: any = null;
-
-// 动态加载 Tauri API
-const initTauri = () => {
-  import('@tauri-apps/api/core')
-    .then((tauri) => {
-      invoke = tauri.invoke;
-      console.log('[SendPanel] Tauri API 加载成功');
-    })
-    .catch(() => {
-      console.warn('[SendPanel] Tauri API 不可用');
-    });
-};
-
-initTauri();
 
 // 计算输入长度
 const inputLength = computed(() => {
@@ -120,16 +108,23 @@ const canSend = computed(() => {
 });
 
 // 解析输入数据为字节数组
-const parseInputData = (): number[] => {
+const parseInputData = (): number[] | null => {
   if (sendMode.value === 'hex') {
     // HEX 模式：解析十六进制字符串
     const hexStr = inputData.value.replace(/\s/g, '');
+    if (hexStr.length === 0) return [];
+    if (!/^[0-9A-Fa-f]+$/.test(hexStr)) {
+      console.warn('[SendPanel] HEX 输入包含非法字符');
+      return null;
+    }
+    if (hexStr.length % 2 !== 0) {
+      console.warn('[SendPanel] HEX 输入长度必须为偶数');
+      return null;
+    }
     const bytes: number[] = [];
     for (let i = 0; i < hexStr.length; i += 2) {
-      const byte = parseInt(hexStr.substr(i, 2), 16);
-      if (!isNaN(byte)) {
-        bytes.push(byte);
-      }
+      const byte = parseInt(hexStr.slice(i, i + 2), 16);
+      bytes.push(byte);
     }
     return bytes;
   } else {
@@ -146,13 +141,18 @@ const sendData = async () => {
   }
 
   const data = parseInputData();
+  if (!data) {
+    return;
+  }
   if (data.length === 0) {
     console.warn('[SendPanel] 没有数据可发送');
     return;
   }
 
   try {
-    if (invoke) {
+    if (isMockPort(serialStore.currentPort)) {
+      mockSerialReplay.injectResponse(data);
+    } else if (isTauriRuntime) {
       // 调用 Tauri 后端发送数据
       await invoke('send_serial_data', {
         portName: serialStore.currentPort,

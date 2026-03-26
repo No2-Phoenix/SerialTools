@@ -1,14 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router';
-import TerminalView from '../views/TerminalView.vue';
-import WaveformView from '../views/WaveformView.vue';
-import PayloadView from '../views/PayloadView.vue';
-import SettingsView from '../views/SettingsView.vue';
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Terminal',
-    component: TerminalView,
+    component: () => import('../views/TerminalView.vue'),
     meta: {
       title: '终端',
       icon: 'Terminal',
@@ -17,7 +13,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/waveform',
     name: 'Waveform',
-    component: WaveformView,
+    component: () => import('../views/WaveformView.vue'),
     meta: {
       title: '波形',
       icon: 'Pulse',
@@ -26,7 +22,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/payload',
     name: 'Payload',
-    component: PayloadView,
+    component: () => import('../views/PayloadView.vue'),
     meta: {
       title: '命令预设',
       icon: 'Code',
@@ -35,7 +31,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/settings',
     name: 'Settings',
-    component: SettingsView,
+    component: () => import('../views/SettingsView.vue'),
     meta: {
       title: '设置',
       icon: 'Settings',

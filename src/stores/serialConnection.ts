@@ -27,6 +27,8 @@ export interface LogEntry {
 }
 
 export const useSerialConnectionStore = defineStore('serialConnection', () => {
+  const MAX_LOG_ENTRIES = 5000;
+
   // 状态
   const isConnected = ref(false);
   const isConnecting = ref(false);
@@ -86,6 +88,10 @@ export const useSerialConnectionStore = defineStore('serialConnection', () => {
       displayMode: 'ascii'
     };
     logs.value.push(entry);
+
+    if (logs.value.length > MAX_LOG_ENTRIES) {
+      logs.value.splice(0, logs.value.length - MAX_LOG_ENTRIES);
+    }
     
     if (type === 'tx') {
       txCount.value += data.length;

@@ -1,6 +1,6 @@
 [package]
 name = "greenserial"
-version = "1.0.0"
+version = "1.0.1"
 description = "极致精美且低功耗的串口助手"
 authors = ["you"]
 license = "MIT"
@@ -96,7 +96,7 @@ tauri-build = { version = "2", features = [] }
 name = "GreenSerial"
 identifier = "com.greenserial.app"
 icon = ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"]
-version = "1.0.0"
+version = "1.0.1"
 resources = []
 copyright = "Copyright (c) 2024 GreenSerial Team"
 category = "Developer Tool"
